@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <textarea
+      name="messageText"
+      id="message-text"
+      cols="30"
+      rows="10"
+    ></textarea>
+    <button id="sendMessage">Send Message</button>
+    <ul id="listMessages"></ul>
+
+    <script>
+      const ws = new WebSocket("WB ENDPOINT");
+      ws.onopen = () => console.log("opened");
+      ws.onclose = () => alert("closed");
+      ws.onmessage = (e) => {
+        const listMessages = document.getElementById("listMessages");
+        const { data } = e;
+
+        const dataParsed = JSON.parse(data);
+
+        console.log("data", dataParsed);
+
+        const li = document.createElement("li");
+        li.innerHTML = dataParsed.payload.message;
+        listMessages.appendChild(li);
+      };
+
+      document.getElementById("sendMessage").onclick = () => {
+        const messageText = document.getElementById("message-text").value;
+
+        console.log("messageText", messageText);
+
+        const message = {
+          action: "MESSAGE",
+          payload: {
+            message: messageText,
+          },
+        };
+
+        ws.send(JSON.stringify(message));
+
+        document.getElementById("message-text").value = "";
+      };
+    </script>
+  </body>
+</html>
